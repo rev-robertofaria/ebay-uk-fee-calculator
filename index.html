@@ -60,6 +60,7 @@ nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:8px 0 1
 @media (max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
 .card h2{font-size:1.05rem;margin:0 0 12px}
+.cardhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.cardhead h2{margin:0}.btn.sm{min-height:36px;padding:4px 10px;font-size:.9rem}
 .card h3{font-size:.95rem;margin:16px 0 8px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
 
 .seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:14px}
@@ -134,7 +135,7 @@ footer{margin-top:28px;color:var(--muted);font-size:.85rem;text-align:center}
 <section id="tab-calc" role="tabpanel">
 <div class="grid">
   <div class="card">
-    <h2>Your sale</h2>
+    <div class="cardhead"><h2>Your sale</h2><button class="btn sm" id="bReset" title="Clear all fields and start again">New calculation</button></div>
     <div class="seg" role="group" aria-label="Seller type">
       <button data-mode="business" aria-pressed="true">Business</button>
       <button data-mode="private" aria-pressed="false">Private</button>
@@ -219,7 +220,7 @@ footer{margin-top:28px;color:var(--muted);font-size:.85rem;text-align:center}
 <section id="tab-compare" role="tabpanel" hidden>
 <div class="grid">
   <div class="card">
-    <h2>Private vs Business — match a displayed price</h2>
+    <div class="cardhead"><h2>Private vs Business — match a displayed price</h2><button class="btn sm" id="bResetC" title="Clear all fields">Clear</button></div>
     <p class="small">Buyers compare the price they <em>see</em>. On private listings eBay adds a Buyer Protection fee on top of your price; on business listings there is none. Enter the shelf price you want to match and see what each account type must set and keeps.</p>
     <div class="row2">
       <div class="field"><label for="cDisplayed">Price the buyer sees (each) £</label><input id="cDisplayed" type="text" inputmode="decimal" placeholder="e.g. 3.99"></div>
@@ -481,6 +482,15 @@ const FIELDS = ["cat", "cat2", "itemPrice", "qty", "postageCharged", "buyerRegio
 function serialise() { const p = new URLSearchParams(); p.set("mode", mode); for (const id of FIELDS) { const el = $("#" + id); const v = el.type === "checkbox" ? (el.checked ? "1" : "") : el.value; if (v) p.set(id, v); } return p.toString(); }
 function saveState() { pref.set("state", serialise()); history.replaceState(null, "", location.pathname + (serialise() ? "?" + serialise() : "")); }
 function restore(qs) { const p = new URLSearchParams(qs); if (!p.toString()) return false; for (const id of FIELDS) { if (!p.has(id)) continue; const el = $("#" + id); if (el.type === "checkbox") el.checked = p.get(id) === "1"; else el.value = p.get(id); } setMode(p.get("mode") || "business"); return true; }
+function resetCalc() {
+  for (const id of FIELDS) { const el = $("#" + id); if (!el) continue; if (el.type === "checkbox") el.checked = false; else if (el.tagName === "SELECT") el.selectedIndex = 0; else el.value = ""; }
+  $("#qty").value = "1"; $("#catSearch").value = ""; fillSelect($("#cat"), "", 1249); fillSelect($("#cat2"), "", "", true); $("#buyerRegion").value = "uk";
+  try { localStorage.removeItem("ebayfees.state"); } catch {}
+  history.replaceState(null, "", location.pathname);
+  update(); $("#itemPrice").focus();
+}
+$("#bReset").onclick = resetCalc;
+$("#bResetC").onclick = () => { ["cDisplayed", "cPostageCharged", "cItemCost", "cPostageCost", "cPackaging", "cAdPct"].forEach((id) => $("#" + id).value = ""); $("#cQty").value = "1"; $("#cVat").checked = false; $("#cBuyerRegion").value = "uk"; $("#cCatSearch").value = ""; fillSelect($("#cCat"), "", 1249); updateCompare(); $("#cDisplayed").focus(); };
 $("#bCopy").onclick = async () => { const u = location.origin + location.pathname + "?" + serialise(); try { await navigator.clipboard.writeText(u); $("#bCopy").textContent = "Copied ✓"; } catch { prompt("Copy this link", u); } setTimeout(() => $("#bCopy").textContent = "Copy link to this scenario", 1500); };
 
 document.querySelectorAll("#tab-calc input, #tab-calc select").forEach((el) => el.addEventListener("input", update));
