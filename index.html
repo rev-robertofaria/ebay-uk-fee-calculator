@@ -89,6 +89,7 @@ table.fees tr.total td{font-weight:700;border-bottom:2px solid var(--text)}
 .kpi .v{font-size:1.3rem;font-weight:700}
 .kpi.big{grid-column:1/-1}
 .pos{color:var(--good)}.neg{color:var(--bad)}
+.kpi.bpf{background:var(--warn-bg);color:var(--warn-ink)}.kpi.bpf .l,.kpi.bpf .small{color:var(--warn-ink)}
 .small{font-size:.85rem;color:var(--muted)}
 .cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media (max-width:480px){.cmp{grid-template-columns:1fr}}
@@ -387,7 +388,10 @@ function renderResult(r, inp) {
   if (ownCosts) t += row("Your item cost, packaging and other costs", "−" + money(ownCosts));
   if (r.outputVat) t += row("Output VAT (price includes VAT)", "−" + money(r.outputVat));
   t += row("<strong>Profit</strong>", `<strong class="${cls}">${money(r.profit)}</strong>`, "total");
-  const buyer = isPriv ? `<div class="kpi"><div class="l">Buyer sees / pays</div><div class="v money">${money(r.buyerPays)}</div><div class="small">your price ${money(r.total)} + ${money(r.buyerProtectionFee)} Buyer Protection fee</div></div>` : `<div class="kpi"><div class="l">Buyer pays</div><div class="v money">${money(r.buyerPays)}</div></div>`;
+  const buyer = isPriv
+    ? `<div class="kpi"><div class="l">Buyer sees / pays</div><div class="v money">${money(r.buyerPays)}</div><div class="small">your price ${money(r.total)}</div></div>
+       <div class="kpi bpf"><div class="l">Buyer Protection fee</div><div class="v money">−${money(r.buyerProtectionFee)}</div><div class="small">collected by eBay from the buyer</div></div>`
+    : `<div class="kpi"><div class="l">Buyer pays</div><div class="v money">${money(r.buyerPays)}</div></div>`;
   return `<div class="kpis">${buyer}<div class="kpi"><div class="l">eBay fees you pay</div><div class="v money">${money(r.feesTotal)}</div><div class="small">${r.feesPctOfSale}% of your sale</div></div>
     <div class="kpi"><div class="l">Order earnings (Seller Hub)</div><div class="v money">${money(earnings)}</div></div>
     <div class="kpi"><div class="l">Your other costs</div><div class="v money">${money(ownCosts + r.outputVat)}</div></div>
