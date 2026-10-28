@@ -8,12 +8,27 @@ Free fee and profit calculator for sellers on **eBay.co.uk** (GBP). Single HTML 
 >
 > This repository will be updated when the changes take effect. Full list: `data/rates.json` → `meta.scheduled_changes`.
 
-> Not affiliated with, endorsed by or sponsored by eBay Inc. Rates are taken from eBay's public help pages and may change. Always check your Seller Hub before pricing.
+> **Please note.** This calculator is the result of careful work transcribing and testing eBay's published fee rules, but it is not guaranteed to be free of errors. Treat the figures as a close estimate of what you will pay, and always confirm against [eBay.co.uk](https://www.ebay.co.uk/help/selling/fees-credits-invoices/fees-business-sellers-activated-managed-payments?id=4809) and your own Seller Hub order details before setting prices.
+>
+> Not affiliated with, endorsed by or sponsored by eBay Inc. eBay is a trademark of eBay Inc.
 
 ## Status
 - [x] Official rate table (`data/rates.json`): business, private and eBay Live, all categories and exceptions
 - [x] Fee engine (`fees.js`) with tests (`node test-fees.mjs`, 61 assertions)
-- [ ] Calculator page
+- [x] Calculator page (`index.html`): Business, Private, eBay Live; Private vs Business comparison; full rate table; installable, offline
+- [ ] Published on GitHub Pages
+
+## Use it
+- Online: https://rev-robertofaria.github.io/ebay-uk-fee-calculator/ (once GitHub Pages is enabled)
+- Offline / installed: Chrome or Edge → **Install**; iPhone or iPad → Share → **Add to Home Screen**. Works without internet after the first visit.
+- Locally: clone the repo and open `index.html` in any modern browser (Safari 15+, Chrome, Edge, Firefox). No build step.
+
+## Develop
+```
+node test-fees.mjs      # 62 assertions: eBay's official examples + anonymised real orders
+node build-rates.mjs    # regenerate data/rates.js after editing data/rates.json
+```
+After changing `index.html`, `fees.js` or `data/rates.js`, bump `CACHE` in `sw.js`.
 
 ## Rates
 | | |

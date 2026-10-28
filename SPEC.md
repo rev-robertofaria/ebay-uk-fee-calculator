@@ -115,4 +115,4 @@ Motors; anúncios noutros sites eBay (taxas desse site + conversão 2.5%/2.75%);
 - [x] Buyer Protection fee — fonte oficial recebida 28/10/2026.
 - [ ] Lista das "selected Collectables categories" com per-order 10p (eBay só dá link "Learn more").
 - [ ] Confirmar no Seller Hub, após 1ª venda Business, a base do limiar £10 (com ou sem portes).
-- [ ] Ativar GitHub Pages (Roberto) após o 1º deploy do `index.html`.
+- [ ] Ativar GitHub Pages (Roberto) — `index.html` já publicado no `main`.

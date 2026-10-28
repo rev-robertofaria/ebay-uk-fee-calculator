@@ -1,14 +1,16 @@
 /* eBay UK fee engine — pure functions, no DOM.
- * Works in the browser (<script type="module">) and in Node (tests).
+ * Plain script: exposes globalThis.EbayFees so it also works when index.html
+ * is opened from the file system. Node tests import it as a module and read
+ * the same global.
  * All money in GBP. Each fee line is rounded to the penny (half up),
  * which matches how eBay shows fees in Seller Hub order details.
  */
 "use strict";
 
-export const round2 = (x) => Math.round((x + Number.EPSILON) * 100) / 100;
+const round2 = (x) => Math.round((x + Number.EPSILON) * 100) / 100;
 
 /* ---------- category helpers ---------- */
-export function findCategory(rates, id) {
+function findCategory(rates, id) {
   return rates.business.categories.find((c) => c.id.includes(Number(id)));
 }
 function rootOf(rates, cat) {
@@ -38,14 +40,14 @@ function categoryFee(cat, itemPrice, perItemAmount, qty) {
 }
 
 /* ---------- Buyer Protection fee (paid by the buyer on UK private listings) ---------- */
-export function buyerProtectionFee(rates, itemPrice, qty = 1, distinctItems = 1) {
+function buyerProtectionFee(rates, itemPrice, qty = 1, distinctItems = 1) {
   const b = rates.private.buyer_protection_fee;
   const variable = tieredFee(b.tiers_per_item, itemPrice) * qty;
   const flat = b.flat_per_item * distinctItems; // once per listing for identical items
   return round2(variable + flat);
 }
 /* Inverse: item price a private seller must set so the buyer sees `displayed` (per unit). */
-export function privatePriceForDisplayed(rates, displayed) {
+function privatePriceForDisplayed(rates, displayed) {
   const b = rates.private.buyer_protection_fee;
   let lo = 0, hi = displayed;
   for (let i = 0; i < 60; i++) {
@@ -84,14 +86,14 @@ function finish(rates, inp, lines, buyerPays, vatOnFees) {
   const profit = round2(netProceeds - costs - outputVat);
   return {
     lines, total, buyerPays: round2(buyerPays), feesNet, vat, feesTotal, outputVat, costs, netProceeds, profit,
-    marginPct: total ? round2(profit / total * 100) : 0,
-    roiPct: costs ? round2(profit / costs * 100) : null,
-    feesPctOfSale: total ? round2(feesTotal / total * 100) : 0,
+    marginPct: total ? Math.round(profit / total * 1000) / 10 : 0,
+    roiPct: costs ? Math.round(profit / costs * 1000) / 10 : null,
+    feesPctOfSale: total ? Math.round(feesTotal / total * 1000) / 10 : 0,
   };
 }
 
 /* ---------- BUSINESS ---------- */
-export function calcBusiness(rates, input) {
+function calcBusiness(rates, input) {
   const inp = baseInputs(input);
   const B = rates.business;
   const cat = findCategory(rates, input.categoryId) || findCategory(rates, 99);
@@ -135,7 +137,7 @@ export function calcBusiness(rates, input) {
 }
 
 /* ---------- PRIVATE (UK-based) ---------- */
-export function calcPrivate(rates, input) {
+function calcPrivate(rates, input) {
   const inp = baseInputs(input);
   const P = rates.private;
   const total = inp.itemPrice * inp.qty + inp.postageCharged;
@@ -167,7 +169,7 @@ export function calcPrivate(rates, input) {
 }
 
 /* ---------- eBay LIVE ---------- */
-export function calcLive(rates, input) {
+function calcLive(rates, input) {
   const inp = baseInputs(input);
   const L = rates.live;
   const total = inp.itemPrice * inp.qty + inp.postageCharged;
@@ -185,7 +187,7 @@ export function calcLive(rates, input) {
 }
 
 /* ---------- inverse: price needed for a target ---------- */
-export function priceForTarget(rates, mode, input, target) {
+function priceForTarget(rates, mode, input, target) {
   // target: { profit: £ } or { marginPct: % }. Returns item price per unit (2 dp) or null.
   const f = { business: calcBusiness, private: calcPrivate, live: calcLive }[mode];
   const ok = (p) => { const r = f(rates, { ...input, itemPrice: p }); return target.profit != null ? r.profit >= target.profit : r.marginPct >= target.marginPct; };
@@ -195,3 +197,5 @@ export function priceForTarget(rates, mode, input, target) {
   for (let i = 0; i < 60; i++) { const mid = (lo + hi) / 2; if (ok(mid)) hi = mid; else lo = mid; }
   return Math.ceil(hi * 100) / 100;
 }
+
+globalThis.EbayFees = { round2, findCategory, tieredFee, buyerProtectionFee, privatePriceForDisplayed, calcBusiness, calcPrivate, calcLive, priceForTarget };

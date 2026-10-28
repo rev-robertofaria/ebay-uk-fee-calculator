@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>eBay UK Fee Calculator</title>
+<meta name="description" content="Free eBay.co.uk fee and profit calculator for private and business sellers. Works offline. Not affiliated with eBay.">
+<meta name="theme-color" content="#0f766e">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="eBay UK Fees">
+<style>
+:root{
+  --bg:#f7f8f7;--panel:#ffffff;--text:#1b1f1e;--muted:#5f6b68;--line:#d9dedc;--accent:#0f766e;--accent-ink:#ffffff;
+  --soft:#e6f2f0;--good:#1a7f37;--bad:#b42318;--warn-bg:#fff4d6;--warn-ink:#6b4e00;--warn-line:#f0c960;--focus:#0f766e;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#121615;--panel:#1a201e;--text:#e8ecea;--muted:#9aa5a1;--line:#2c3533;--accent:#2fb3a6;--accent-ink:#06201d;
+    --soft:#17302d;--good:#3fb950;--bad:#f0665a;--warn-bg:#3a2f0e;--warn-ink:#f3d67a;--warn-line:#7a6220;--focus:#2fb3a6;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121615;--panel:#1a201e;--text:#e8ecea;--muted:#9aa5a1;--line:#2c3533;--accent:#2fb3a6;--accent-ink:#06201d;
+  --soft:#17302d;--good:#3fb950;--bad:#f0665a;--warn-bg:#3a2f0e;--warn-ink:#f3d67a;--warn-line:#7a6220;--focus:#2fb3a6;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+button,input,select{font:inherit;color:inherit}
+[hidden]{display:none!important}
+a{color:var(--accent)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px 48px}
+
+header.top{display:flex;align-items:center;gap:12px;padding:14px 0 6px}
+header.top img{width:40px;height:40px;border-radius:9px}
+header.top h1{font-size:1.25rem;margin:0;line-height:1.2}
+header.top p{margin:0;color:var(--muted);font-size:.85rem}
+header.top .spacer{flex:1}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:9px;padding:8px 12px;cursor:pointer;min-height:44px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.btn:focus-visible,input:focus-visible,select:focus-visible,.tab:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+.notice{background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn-line);border-radius:10px;padding:10px 14px;margin:10px 0;font-size:.92rem}
+.verified{color:var(--muted);font-size:.85rem;margin:6px 0 12px}
+
+nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:8px 0 18px;overflow-x:auto}
+.tab{background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px;cursor:pointer;color:var(--muted);white-space:nowrap;min-height:44px;font-weight:600}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+@media (max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.card h2{font-size:1.05rem;margin:0 0 12px}
+.card h3{font-size:.95rem;margin:16px 0 8px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.seg button{flex:1;border:0;background:none;padding:10px 6px;cursor:pointer;min-height:44px;color:var(--muted);font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.field label{font-size:.9rem;color:var(--muted)}
+.field input,.field select{width:100%;min-height:44px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--bg);font-size:16px}
+.field .hint{font-size:.8rem;color:var(--muted)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media (max-width:480px){.row3{grid-template-columns:1fr 1fr}}
+.check{display:flex;align-items:center;gap:10px;min-height:44px;font-size:.95rem}
+.check input{width:22px;height:22px;margin:0;accent-color:var(--accent)}
+details.adv{border-top:1px solid var(--line);margin-top:6px;padding-top:8px}
+details.adv summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:44px;display:flex;align-items:center}
+
+.money{font-variant-numeric:tabular-nums}
+table.fees{width:100%;border-collapse:collapse;font-size:.95rem}
+table.fees td{padding:7px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+table.fees td:last-child{text-align:right;white-space:nowrap}
+table.fees tr.total td{font-weight:700;border-bottom:2px solid var(--text)}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.kpi{background:var(--soft);border-radius:10px;padding:10px 12px}
+.kpi .l{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+.kpi .v{font-size:1.3rem;font-weight:700}
+.kpi.big{grid-column:1/-1}
+.pos{color:var(--good)}.neg{color:var(--bad)}
+.small{font-size:.85rem;color:var(--muted)}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:480px){.cmp{grid-template-columns:1fr}}
+.cmp .card{padding:12px}
+.badge{display:inline-block;background:var(--soft);color:var(--accent);border-radius:999px;padding:2px 10px;font-size:.8rem;font-weight:600}
+
+.tablewrap{overflow-x:auto}
+table.rates{width:100%;border-collapse:collapse;font-size:.9rem}
+table.rates th,table.rates td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+table.rates th{color:var(--muted);font-weight:600;position:sticky;top:0;background:var(--panel)}
+table.rates td.sub{padding-left:26px;color:var(--muted)}
+table.rates td.sub::before{content:"↳ ";}
+.about p,.about li{line-height:1.6}
+footer{margin-top:28px;color:var(--muted);font-size:.85rem;text-align:center}
+@media print{header.top .btn,nav.tabs,.notice,footer .btn{display:none}body{background:#fff;color:#000}.card{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <img src="icons/icon-192.png" alt="" width="40" height="40">
+  <div>
+    <h1>eBay UK Fee Calculator</h1>
+    <p>Free · works offline · not affiliated with eBay</p>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn" id="bInstall" hidden title="Install as an app">Install</button>
+  <button class="btn" id="bTheme" title="Switch light / dark" aria-label="Switch light or dark theme">Theme</button>
+</header>
+
+<div id="notice" class="notice" hidden></div>
+<p class="verified" id="verified"></p>
+
+<nav class="tabs" role="tablist">
+  <button class="tab" role="tab" aria-selected="true" data-tab="calc">Calculator</button>
+  <button class="tab" role="tab" aria-selected="false" data-tab="compare">Compare</button>
+  <button class="tab" role="tab" aria-selected="false" data-tab="rates">Rates</button>
+  <button class="tab" role="tab" aria-selected="false" data-tab="about">About</button>
+</nav>
+
+<!-- ============ CALCULATOR ============ -->
+<section id="tab-calc" role="tabpanel">
+<div class="grid">
+  <div class="card">
+    <h2>Your sale</h2>
+    <div class="seg" role="group" aria-label="Seller type">
+      <button data-mode="business" aria-pressed="true">Business</button>
+      <button data-mode="private" aria-pressed="false">Private</button>
+      <button data-mode="live" aria-pressed="false">eBay Live</button>
+    </div>
+
+    <div id="catBlock">
+      <div class="field">
+        <label for="catSearch">Category</label>
+        <input id="catSearch" type="search" placeholder="Type to filter, e.g. video games" autocomplete="off">
+        <select id="cat" aria-label="Category"></select>
+        <span class="hint" id="catHint"></span>
+      </div>
+    </div>
+    <div id="liveBlock" hidden>
+      <div class="field"><label for="liveGroup">Item type</label>
+        <select id="liveGroup"><option value="all_other">All other categories (6% commission)</option><option value="coins_bullion_sneakers">Coins, Bullion or Sneakers (4% commission)</option></select></div>
+    </div>
+
+    <div class="row2">
+      <div class="field"><label for="itemPrice">Item price (each) £</label><input id="itemPrice" type="text" inputmode="decimal" placeholder="0.00"></div>
+      <div class="field"><label for="qty">Quantity</label><input id="qty" type="text" inputmode="numeric" value="1"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label for="postageCharged">Postage charged to buyer £</label><input id="postageCharged" type="text" inputmode="decimal" placeholder="0.00"><span class="hint">Leave 0 for free postage</span></div>
+      <div class="field"><label for="buyerRegion">Buyer's delivery address</label>
+        <select id="buyerRegion">
+          <option value="uk">United Kingdom</option>
+          <option value="eu_north">Eurozone / Northern Europe</option>
+          <option value="us_ca">United States / Canada</option>
+          <option value="other">All other countries</option>
+        </select></div>
+    </div>
+
+    <h3>Your costs (optional)</h3>
+    <div class="row2">
+      <div class="field"><label for="itemCost">Item cost (each) £</label><input id="itemCost" type="text" inputmode="decimal" placeholder="0.00"></div>
+      <div class="field"><label for="postageCost">Postage you pay (label) £</label><input id="postageCost" type="text" inputmode="decimal" placeholder="0.00"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label for="packaging">Packaging £</label><input id="packaging" type="text" inputmode="decimal" placeholder="0.00"></div>
+      <div class="field"><label for="otherCosts">Other costs £</label><input id="otherCosts" type="text" inputmode="decimal" placeholder="0.00"></div>
+    </div>
+    <div class="field"><label for="adPct">Promoted Listings ad rate % (optional)</label><input id="adPct" type="text" inputmode="decimal" placeholder="leave blank if not promoted"><span class="hint">Your own campaign rate; charged on the total sale when the item sells.</span></div>
+
+    <details class="adv"><summary>Advanced</summary>
+      <label class="check"><input type="checkbox" id="vatRegistered"> I'm VAT registered (eBay fees shown net, VAT reclaimable)</label>
+      <label class="check" id="pivRow"><input type="checkbox" id="priceIncludesVat"> My price includes 20% VAT (deduct output VAT from profit)</label>
+      <div id="advBiz">
+        <label class="check"><input type="checkbox" id="reducedPerOrder"> Reduced 10p per-order fee (selected Collectables listings)</label>
+        <label class="check"><input type="checkbox" id="topRatedPremium"> Top Rated Seller, Premium Service listing (−10% on variable fee)</label>
+        <div class="field"><label for="sellerSurcharge">Seller performance</label>
+          <select id="sellerSurcharge"><option value="">Above Standard / Top Rated (no surcharge)</option><option value="below_standard">Below Standard (+6 pp)</option><option value="below_standard_4_months">Below Standard 4+ months (+7 pp)</option><option value="inad_very_high">Very high "Item not as described" (+4 pp)</option><option value="inad_very_high_4_months">Very high INAD 4+ months (+5 pp)</option></select></div>
+        <div class="field"><label for="cat2">Second category (optional — the higher fee applies)</label><select id="cat2"><option value="">None</option></select></div>
+      </div>
+      <div id="advPriv" hidden>
+        <label class="check"><input type="checkbox" id="outsideUK"> Private seller registered outside the UK (12.8% + 30p, ROF 0.42%)</label>
+        <label class="check"><input type="checkbox" id="trainers"> Item is Trainers (8% when item price ≥ £100, seller outside UK)</label>
+      </div>
+      <div class="row2">
+        <div class="field"><label for="listingFee">Listing fee £</label><input id="listingFee" type="text" inputmode="decimal" placeholder="0.00"><span class="hint" id="listingHint"></span></div>
+        <div class="field"><label for="upgrades">Listing upgrades £</label><input id="upgrades" type="text" inputmode="decimal" placeholder="0.00"><span class="hint">Subtitle £2, Gallery Plus £2.50…</span></div>
+      </div>
+    </details>
+  </div>
+
+  <div class="card" aria-live="polite">
+    <h2>Result</h2>
+    <div id="result"></div>
+    <h3>Price for a target</h3>
+    <div class="row2">
+      <div class="field"><label for="targetProfit">Target profit (per order) £</label><input id="targetProfit" type="text" inputmode="decimal" placeholder="e.g. 2.00"></div>
+      <div class="field"><label for="targetMargin">or target margin %</label><input id="targetMargin" type="text" inputmode="decimal" placeholder="e.g. 30"></div>
+    </div>
+    <div id="target" class="small"></div>
+    <p class="small" style="margin-top:14px">Estimates only — not guaranteed to be free of errors. Always confirm on eBay.co.uk and in your Seller Hub order details before setting prices. <button class="btn" id="bCopy" style="min-height:36px;padding:4px 10px">Copy link to this scenario</button></p>
+  </div>
+</div>
+</section>
+
+<!-- ============ COMPARE ============ -->
+<section id="tab-compare" role="tabpanel" hidden>
+<div class="grid">
+  <div class="card">
+    <h2>Private vs Business — match a displayed price</h2>
+    <p class="small">Buyers compare the price they <em>see</em>. On private listings eBay adds a Buyer Protection fee on top of your price; on business listings there is none. Enter the shelf price you want to match and see what each account type must set and keeps.</p>
+    <div class="row2">
+      <div class="field"><label for="cDisplayed">Price the buyer sees (each) £</label><input id="cDisplayed" type="text" inputmode="decimal" placeholder="e.g. 3.99"></div>
+      <div class="field"><label for="cQty">Quantity</label><input id="cQty" type="text" inputmode="numeric" value="1"></div>
+    </div>
+    <div class="field"><label for="cCatSearch">Business category</label><input id="cCatSearch" type="search" placeholder="Type to filter" autocomplete="off"><select id="cCat"></select></div>
+    <div class="row2">
+      <div class="field"><label for="cPostageCharged">Postage charged to buyer £</label><input id="cPostageCharged" type="text" inputmode="decimal" placeholder="0.00"></div>
+      <div class="field"><label for="cBuyerRegion">Buyer's delivery address</label>
+        <select id="cBuyerRegion"><option value="uk">United Kingdom</option><option value="eu_north">Eurozone / Northern Europe</option><option value="us_ca">United States / Canada</option><option value="other">All other countries</option></select></div>
+    </div>
+    <div class="row3">
+      <div class="field"><label for="cItemCost">Item cost (each) £</label><input id="cItemCost" type="text" inputmode="decimal" placeholder="0.00"></div>
+      <div class="field"><label for="cPostageCost">Postage you pay £</label><input id="cPostageCost" type="text" inputmode="decimal" placeholder="0.00"></div>
+      <div class="field"><label for="cPackaging">Packaging £</label><input id="cPackaging" type="text" inputmode="decimal" placeholder="0.00"></div>
+    </div>
+    <div class="field"><label for="cAdPct">Promoted Listings ad rate % (optional)</label><input id="cAdPct" type="text" inputmode="decimal" placeholder="leave blank if not promoted"></div>
+    <label class="check"><input type="checkbox" id="cVat"> I'm VAT registered</label>
+  </div>
+  <div class="card" aria-live="polite">
+    <h2>Side by side</h2>
+    <div id="compare"></div>
+  </div>
+</div>
+</section>
+
+<!-- ============ RATES ============ -->
+<section id="tab-rates" role="tabpanel" hidden>
+<div class="card">
+  <h2>Business seller final value fees by category</h2>
+  <p class="small">Variable % of the total amount of the sale (item + postage + taxes), calculated per item, <strong>plus</strong> a per-order fee of £0.30 (orders up to £10) or £0.40 (over £10) and a 0.35% regulatory operating fee. All business fees exclude VAT. Home, Furniture &amp; DIY and selected Collectables listings pay a reduced 10p per-order fee on orders up to £10.</p>
+  <div class="field"><label for="rateSearch">Filter</label><input id="rateSearch" type="search" placeholder="Category name or ID" autocomplete="off"></div>
+  <div class="tablewrap"><table class="rates"><thead><tr><th>Category</th><th>ID</th><th>Final value fee</th></tr></thead><tbody id="rateRows"></tbody></table></div>
+  <h3>Other business fees</h3>
+  <div id="bizOther" class="small"></div>
+  <h3>Private sellers (UK-based)</h3>
+  <div id="privOther" class="small"></div>
+  <h3>eBay Live</h3>
+  <div id="liveOther" class="small"></div>
+  <h3>Scheduled changes</h3>
+  <div id="sched" class="small"></div>
+</div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section id="tab-about" role="tabpanel" hidden>
+<div class="card about">
+  <h2>About</h2>
+  <p><strong>eBay UK Fee Calculator</strong> estimates what eBay.co.uk charges UK-registered sellers and what is left after your own costs. It is free, open source (MIT) and runs entirely in your browser — nothing you type leaves your device.</p>
+  <p class="notice" style="margin:0 0 12px"><strong>Please note.</strong> This calculator is the result of careful work transcribing and testing eBay’s published fee rules, but it is not guaranteed to be free of errors. Treat the figures as a close estimate of what you will pay, and always confirm against <a href="https://www.ebay.co.uk/help/selling/fees-credits-invoices/fees-business-sellers-activated-managed-payments?id=4809" rel="noopener">eBay.co.uk</a> and your own Seller Hub order details before setting prices.</p>
+  <p><strong>Not affiliated with eBay.</strong> eBay is a trademark of eBay Inc. The rates here are transcribed from eBay's public help pages (see Rates for the verification date). Fees change; your Seller Hub order details are always the final word.</p>
+  <h3>How it calculates</h3>
+  <ul>
+    <li>Business: final value fee % by category on item + postage, tiered rates per item, per-order fee (£0.30 / £0.40, reduced 10p where eBay says so), 0.35% regulatory operating fee, international fee by the buyer's delivery region, optional surcharges and Top Rated discount, then 20% VAT on fees unless you are VAT registered.</li>
+    <li>Private (UK): no final value fee. The Buyer Protection fee (£0.10 + 7% to £20, 4% to £300, 2% to £4,000) is paid by the buyer on top of your price — the calculator shows the price the buyer sees. 3% international fee if posting abroad. VAT is added to Promoted Listings fees.</li>
+    <li>eBay Live: commission (6%, or 4% for coins, bullion and sneakers, capped at £100 per item) + 2.42% payment processing + per-order fee.</li>
+    <li>Assumption flagged for confirmation: the £10 per-order threshold is applied to the order total including postage.</li>
+  </ul>
+  <h3>Out of scope</h3>
+  <ul><li>Motors (cars, motorcycles, vehicles).</li><li>Listings on other eBay sites (eBay.de, eBay.com…): that site's fee card applies, plus the GBP currency conversion charge.</li><li>Fee credits on refunds and cancellations; postage label prices.</li></ul>
+  <h3>Install &amp; offline</h3>
+  <p>Chrome / Edge: use the <em>Install</em> button. iPhone / iPad: Share → <em>Add to Home Screen</em>. After the first visit the calculator works without internet.</p>
+  <h3>Privacy</h3>
+  <p>No analytics, no cookies, no accounts. Your last scenario is kept in your browser's local storage only.</p>
+  <p class="small" id="aboutMeta"></p>
+  <p>Made by <a href="https://github.com/rev-robertofaria" rel="noopener">Roberto Faria</a> · <a href="https://github.com/rev-robertofaria/ebay-uk-fee-calculator" rel="noopener">Source code &amp; issues on GitHub</a> · MIT licence</p>
+</div>
+</section>
+
+<footer><p class="small">Estimates only — always confirm on eBay.co.uk before setting prices.</p>Made by <a href="https://github.com/rev-robertofaria" rel="noopener">Roberto Faria</a> · Not affiliated with eBay · <span id="footVer"></span></footer>
+</div>
+
+<script src="data/rates.js"></script>
+<script src="fees.js"></script>
+<script>
+"use strict";
+(function(){
+const R = globalThis.EBAY_RATES, F = globalThis.EbayFees;
+const $ = (s) => document.querySelector(s);
+const gbp = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
+const money = (n) => gbp.format(n);
+const num = (id) => { const v = String($("#" + id).value).replace(",", ".").trim(); const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+const pref = { get(k, d) { try { const v = localStorage.getItem("ebayfees." + k); return v === null ? d : v; } catch { return d; } }, set(k, v) { try { localStorage.setItem("ebayfees." + k, v); } catch {} } };
+
+/* ---------- theme ---------- */
+function applyTheme(t) { document.documentElement.dataset.theme = t; }
+applyTheme(pref.get("theme", matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+$("#bTheme").onclick = () => { const t = document.documentElement.dataset.theme === "dark" ? "light" : "dark"; applyTheme(t); pref.set("theme", t); };
+
+/* ---------- dates / notices ---------- */
+const parseUK = (s) => { const [d, m, y] = s.split("/").map(Number); return new Date(y, m - 1, d); };
+const today = new Date(); today.setHours(0, 0, 0, 0);
+const isoToday = today.toISOString().slice(0, 10);
+$("#verified").textContent = `Rates verified on ${R.meta.verified_on} (eBay pages last updated ${R.meta.source_pages_last_updated}).`;
+(function notices() {
+  const soon = (R.meta.scheduled_changes || []).filter((c) => { const d = parseUK(c.date); const days = (d - today) / 864e5; return days <= 14 && days >= -45; });
+  if (!soon.length) return;
+  const n = $("#notice"); n.hidden = false;
+  n.innerHTML = soon.map((c) => { const past = parseUK(c.date) <= today; return `<strong>${past ? "Rate change effective" : "Rate change on"} ${c.date}:</strong> ${c.what}${past ? " — check that this page has been updated (see verification date below)." : "."}`; }).join("<br>");
+})();
+$("#footVer").textContent = `Rates ${R.meta.verified_on}`;
+$("#aboutMeta").textContent = `Rates verified on ${R.meta.verified_on}. Sources: eBay.co.uk help pages last updated ${R.meta.source_pages_last_updated}.`;
+
+/* ---------- categories ---------- */
+const cats = R.business.categories;
+const roots = cats.filter((c) => !c.parent);
+const rateText = (c) => c.flat_if_item_price_at_least ? `${c.tiers[0].pct}% (7% if item price ≥ £100)` : c.tiers.length === 1 ? `${c.tiers[0].pct}%` : c.tiers.map((t, i) => t.up_to ? `${t.pct}% ${i ? "to" : "up to"} £${t.up_to.toLocaleString("en-GB")}` : `${t.pct}% above`).join(", ");
+function fillSelect(sel, filter, keep, allowNone) {
+  const q = (filter || "").trim().toLowerCase();
+  const match = (c) => !q || c.name.toLowerCase().includes(q) || c.id.some((i) => String(i).includes(q));
+  const prev = keep != null ? keep : sel.value;
+  sel.innerHTML = allowNone ? '<option value="">None</option>' : "";
+  for (const r of roots) {
+    const kids = cats.filter((c) => c.parent === r.name);
+    const show = [r, ...kids].filter((c) => match(c) || (match(r) && c === r) || (q && match(r)));
+    if (!show.length) continue;
+    const og = document.createElement("optgroup"); og.label = r.name;
+    for (const c of show) { const o = document.createElement("option"); o.value = c.id[0]; o.textContent = (c === r ? (kids.length ? `${r.name} (all other subcategories)` : r.name) : `↳ ${c.name}`) + ` — ${rateText(c)}`; og.appendChild(o); }
+    sel.appendChild(og);
+  }
+  if ([...sel.options].some((o) => o.value === String(prev))) sel.value = prev; else if (sel.options.length) sel.selectedIndex = 0;
+}
+fillSelect($("#cat"), "", 1249); fillSelect($("#cat2"), "", "", true); fillSelect($("#cCat"), "", 1249);
+$("#catSearch").addEventListener("input", (e) => { fillSelect($("#cat"), e.target.value); update(); });
+$("#cCatSearch").addEventListener("input", (e) => { fillSelect($("#cCat"), e.target.value); updateCompare(); });
+
+/* ---------- mode ---------- */
+let mode = "business";
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll(".seg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === m)));
+  $("#catBlock").hidden = m !== "business"; $("#liveBlock").hidden = m !== "live";
+  $("#advBiz").hidden = m !== "business"; $("#advPriv").hidden = m !== "private";
+  $("#listingHint").textContent = m === "business" ? "No Shop: £0.30 per listing · Basic Shop £27/month: 250 free, then 10p" : m === "private" ? "300 free listings a month, then £0.35" : "No insertion fee on eBay Live";
+  update();
+}
+document.querySelectorAll(".seg button").forEach((b) => b.onclick = () => setMode(b.dataset.mode));
+
+/* ---------- calculator ---------- */
+function inputs() {
+  return { categoryId: $("#cat").value, secondCategoryId: $("#cat2").value || null, itemPrice: num("itemPrice"), qty: num("qty") || 1,
+    postageCharged: num("postageCharged"), buyerRegion: $("#buyerRegion").value, itemCost: num("itemCost"), postageCost: num("postageCost"),
+    packaging: num("packaging"), otherCosts: num("otherCosts"), adPct: num("adPct"), listingFee: num("listingFee"), upgrades: num("upgrades"),
+    vatRegistered: $("#vatRegistered").checked, priceIncludesVat: $("#priceIncludesVat").checked, reducedPerOrder: $("#reducedPerOrder").checked,
+    topRatedPremium: $("#topRatedPremium").checked, sellerSurcharge: $("#sellerSurcharge").value || null,
+    outsideUK: $("#outsideUK").checked, trainers: $("#trainers").checked, liveGroup: $("#liveGroup").value, asOf: isoToday };
+}
+const calc = { business: F.calcBusiness, private: F.calcPrivate, live: F.calcLive };
+function renderResult(r, inp) {
+  const lines = r.lines.map((l) => `<tr><td>${l.label}</td><td class="money">${l.amount ? "−" + money(l.amount) : money(0)}</td></tr>`).join("");
+  const cls = r.profit >= 0 ? "pos" : "neg";
+  const buyer = mode === "private" && r.buyerProtectionFee ? `<div class="kpi"><div class="l">Buyer sees / pays</div><div class="v money">${money(r.buyerPays)}</div><div class="small">incl. ${money(r.buyerProtectionFee)} Buyer Protection fee paid to eBay</div></div>` : `<div class="kpi"><div class="l">Buyer pays</div><div class="v money">${money(r.buyerPays)}</div></div>`;
+  return `<div class="kpis">${buyer}<div class="kpi"><div class="l">eBay fees</div><div class="v money">${money(r.feesTotal)}</div><div class="small">${r.feesPctOfSale}% of sale</div></div>
+    <div class="kpi"><div class="l">You receive from eBay</div><div class="v money">${money(r.netProceeds)}</div></div>
+    <div class="kpi"><div class="l">Your costs</div><div class="v money">${money(r.costs + r.outputVat)}</div>${r.outputVat ? `<div class="small">incl. ${money(r.outputVat)} output VAT</div>` : ""}</div>
+    <div class="kpi big"><div class="l">Profit</div><div class="v money ${cls}">${money(r.profit)}</div><div class="small">margin ${r.marginPct}%${r.roiPct != null ? ` · ROI ${r.roiPct}%` : ""}</div></div></div>
+    <table class="fees"><tr><td>Sale total (item${inp.qty > 1 ? ` × ${inp.qty}` : ""}${inp.postageCharged ? " + postage" : ""})</td><td class="money">${money(r.total)}</td></tr>${lines}<tr class="total"><td>Total eBay fees</td><td class="money">−${money(r.feesTotal)}</td></tr></table>`;
+}
+function update() {
+  const inp = inputs();
+  $("#catHint").textContent = mode === "business" ? (F.findCategory(R, inp.categoryId) || {}).note || "" : "";
+  $("#pivRow").style.display = $("#vatRegistered").checked ? "" : "none";
+  if (!inp.itemPrice) { $("#result").innerHTML = '<p class="small">Enter an item price to see the fees.</p>'; $("#target").textContent = ""; saveState(); return; }
+  const r = calc[mode](R, inp);
+  $("#result").innerHTML = renderResult(r, inp);
+  const tp = num("targetProfit"), tm = num("targetMargin"); let msg = "";
+  if (tp) { const p = F.priceForTarget(R, mode, inp, { profit: tp }); msg = p ? `For ${money(tp)} profit per order, set the item price to <strong>${money(p)}</strong> each.` : "Target not reachable."; }
+  else if (tm) { const p = F.priceForTarget(R, mode, inp, { marginPct: tm }); msg = p ? `For a ${tm}% margin, set the item price to <strong>${money(p)}</strong> each.` : "Target not reachable."; }
+  if (mode === "private" && !inp.outsideUK && msg) msg += ` Buyers will see ${money(F.buyerProtectionFee(R, F.priceForTarget(R, mode, inp, tp ? { profit: tp } : { marginPct: tm }), 1) + F.priceForTarget(R, mode, inp, tp ? { profit: tp } : { marginPct: tm }))} each.`;
+  $("#target").innerHTML = msg;
+  saveState();
+}
+
+/* ---------- compare ---------- */
+function updateCompare() {
+  const displayed = num("cDisplayed"), qty = num("cQty") || 1;
+  if (!displayed) { $("#compare").innerHTML = '<p class="small">Enter the price buyers see.</p>'; return; }
+  const common = { qty, postageCharged: num("cPostageCharged"), buyerRegion: $("#cBuyerRegion").value, itemCost: num("cItemCost"), postageCost: num("cPostageCost"), packaging: num("cPackaging"), adPct: num("cAdPct"), vatRegistered: $("#cVat").checked };
+  const privPrice = F.privatePriceForDisplayed(R, displayed);
+  const pr = F.calcPrivate(R, { ...common, itemPrice: privPrice });
+  const br = F.calcBusiness(R, { ...common, itemPrice: displayed, categoryId: $("#cCat").value });
+  const bizSame = F.priceForTarget(R, "business", { ...common, categoryId: $("#cCat").value }, { profit: pr.profit });
+  const col = (title, set, r, note) => `<div class="card"><span class="badge">${title}</span>
+    <table class="fees"><tr><td>Price you set (each)</td><td class="money"><strong>${money(set)}</strong></td></tr>
+    <tr><td>Buyer sees (each)</td><td class="money">${money(displayed)}</td></tr>
+    <tr><td>Buyer pays (order)</td><td class="money">${money(r.buyerPays)}</td></tr>
+    <tr><td>eBay fees you pay</td><td class="money">−${money(r.feesTotal)}</td></tr>
+    <tr><td>You receive from eBay</td><td class="money">${money(r.netProceeds)}</td></tr>
+    <tr><td>Your costs</td><td class="money">−${money(r.costs)}</td></tr>
+    <tr class="total"><td>Profit</td><td class="money ${r.profit >= 0 ? "pos" : "neg"}">${money(r.profit)}</td></tr></table><p class="small">${note}</p></div>`;
+  const diff = F.round2(pr.profit - br.profit);
+  $("#compare").innerHTML = `<div class="cmp">${col("Private", privPrice, pr, `Buyer Protection fee ${money(pr.buyerProtectionFee)} is added by eBay on top of your price.`)}${col("Business", displayed, br, `${(F.findCategory(R, $("#cCat").value) || {}).name || ""} rate + per-order fee + 0.35%${common.vatRegistered ? "" : " + VAT"}.`)}</div>
+    <p style="margin-top:12px">At the same shelf price, <strong>${diff >= 0 ? "Private" : "Business"}</strong> leaves you <strong>${money(Math.abs(diff))}</strong> more per order.${bizSame ? ` To keep the Private profit as a business seller you would need to display <strong>${money(bizSame)}</strong> each.` : ""}</p>
+    <p class="small">eBay's policy: items bought to resell, or made to sell, must be listed on a business account regardless of fees.</p>`;
+}
+
+/* ---------- rates tab ---------- */
+function renderRates(filter) {
+  const q = (filter || "").toLowerCase();
+  const rows = [];
+  for (const r of roots) {
+    const kids = cats.filter((c) => c.parent === r.name);
+    const list = [r, ...kids].filter((c) => !q || c.name.toLowerCase().includes(q) || c.id.some((i) => String(i).includes(q)) || r.name.toLowerCase().includes(q));
+    for (const c of list) rows.push(`<tr><td${c.parent ? ' class="sub"' : ""}>${c === r && kids.length ? `${r.name}, except subcategories below` : c.name}${c.reduced_per_order === "all" ? ' <span class="badge">10p per-order ≤ £10</span>' : ""}</td><td>${c.id.map((i) => "#" + i).join("<br>")}</td><td>${rateText(c)}</td></tr>`);
+  }
+  $("#rateRows").innerHTML = rows.join("");
+}
+renderRates("");
+$("#rateSearch").addEventListener("input", (e) => renderRates(e.target.value));
+(function others() {
+  const B = R.business, P = R.private, L = R.live;
+  $("#bizOther").innerHTML = `<ul><li>Per-order fee: £${B.per_order_fee.up_to_threshold.toFixed(2)} (order ≤ £10) · £${B.per_order_fee.above_threshold.toFixed(2)} (over £10) · reduced £${B.per_order_fee.reduced_up_to_threshold.toFixed(2)} in Home, Furniture &amp; DIY and selected Collectables.</li>
+    <li>Regulatory operating fee: ${B.regulatory_operating_fee_pct}% of the total sale.</li>
+    <li>International fee (delivery address outside the UK): Eurozone &amp; Northern Europe ${B.international_fee_pct.eurozone_and_northern_europe}% · US &amp; Canada ${B.international_fee_pct.us_and_canada}% · other ${B.international_fee_pct.other_countries}%.</li>
+    <li>Listing fees: No Shop £0.30 per listing (no free allowance) · Basic £27/month, 250 free, then 10p · Featured £77/month, 1,500 free, then 5p · Anchor £437/month, unlimited.</li>
+    <li>Below Standard: +6 pp (+7 pp after 4 months); very high "Item not as described": +4 pp (+5 pp). Top Rated Premium Service listings: −10% on the variable fee.</li>
+    <li>Dispute fee £${B.dispute_fee.toFixed(2)}. All business fees exclude VAT (20%).</li></ul>`;
+  $("#privOther").innerHTML = `<ul><li>No final value fee and no regulatory operating fee (excluding Motors). ${P.free_listings_per_month} free listings a month (${P.free_listings_with_shop} with a £${P.shop_monthly} Shop), then £${P.extra_listing.toFixed(2)} each.</li>
+    <li>Buyer Protection fee, paid by the <strong>buyer</strong> on top of your price: £0.10 per item + 7% up to £20, 4% from £20 to £300, 2% from £300 to £4,000. Flat fee charged once for identical items in one listing.</li>
+    <li>International fee ${P.international_fee_pct}% if the delivery address is outside the UK. Dispute fee £${P.dispute_fee.toFixed(2)}. Private fees include VAT.</li>
+    <li>Private sellers registered outside the UK: ${P.registered_outside_uk.final_value_fee_pct}% + 30p per order (3% above £5,000 on a single item), regulatory operating fee ${P.registered_outside_uk.regulatory_operating_fee_pct}%.</li></ul>`;
+  $("#liveOther").innerHTML = `<ul><li>Commission ${L.groups.all_other.commission_pct}% (coins, bullion, sneakers ${L.groups.coins_bullion_sneakers.commission_pct}%), capped at £${L.groups.all_other.commission_cap_per_item} per item · payment processing ${L.payment_processing_pct}% · £${L.per_order_fee.toFixed(2)} per order (promotion: £${L.promotion.per_order_fee_orders_up_to_10.toFixed(2)} on orders ≤ £10 until ${L.promotion.until}). No insertion fee. Fees exclude VAT.</li></ul>`;
+  $("#sched").innerHTML = `<ul>${(R.meta.scheduled_changes || []).map((c) => `<li><strong>${c.date}</strong> — ${c.what}${c.applies_when ? ` <em>(${c.applies_when})</em>` : ""}.</li>`).join("")}</ul>
+    <p>Seller currency conversion charge: ${B.currency_conversion_pct.map((x) => `${x.pct}% ${x.from ? "from " + x.from : "until " + x.until}`).join(" · ")} — only when eBay converts funds for items listed or sold on another eBay site.</p>`;
+})();
+
+/* ---------- tabs ---------- */
+function showTab(name) {
+  document.querySelectorAll(".tab").forEach((t) => t.setAttribute("aria-selected", String(t.dataset.tab === name)));
+  ["calc", "compare", "rates", "about"].forEach((n) => $("#tab-" + n).hidden = n !== name);
+  if (name === "compare") updateCompare();
+  pref.set("tab", name);
+}
+document.querySelectorAll(".tab").forEach((t) => t.onclick = () => showTab(t.dataset.tab));
+
+/* ---------- state in URL + localStorage ---------- */
+const FIELDS = ["cat", "cat2", "itemPrice", "qty", "postageCharged", "buyerRegion", "itemCost", "postageCost", "packaging", "otherCosts", "adPct", "listingFee", "upgrades", "vatRegistered", "priceIncludesVat", "reducedPerOrder", "topRatedPremium", "sellerSurcharge", "outsideUK", "trainers", "liveGroup", "targetProfit", "targetMargin"];
+function serialise() { const p = new URLSearchParams(); p.set("mode", mode); for (const id of FIELDS) { const el = $("#" + id); const v = el.type === "checkbox" ? (el.checked ? "1" : "") : el.value; if (v) p.set(id, v); } return p.toString(); }
+function saveState() { pref.set("state", serialise()); history.replaceState(null, "", location.pathname + (serialise() ? "?" + serialise() : "")); }
+function restore(qs) { const p = new URLSearchParams(qs); if (!p.toString()) return false; for (const id of FIELDS) { if (!p.has(id)) continue; const el = $("#" + id); if (el.type === "checkbox") el.checked = p.get(id) === "1"; else el.value = p.get(id); } setMode(p.get("mode") || "business"); return true; }
+$("#bCopy").onclick = async () => { const u = location.origin + location.pathname + "?" + serialise(); try { await navigator.clipboard.writeText(u); $("#bCopy").textContent = "Copied ✓"; } catch { prompt("Copy this link", u); } setTimeout(() => $("#bCopy").textContent = "Copy link to this scenario", 1500); };
+
+document.querySelectorAll("#tab-calc input, #tab-calc select").forEach((el) => el.addEventListener("input", update));
+document.querySelectorAll("#tab-compare input, #tab-compare select").forEach((el) => el.addEventListener("input", updateCompare));
+
+if (!restore(location.search.slice(1))) { if (!restore(pref.get("state", ""))) setMode("business"); }
+showTab(location.search ? "calc" : pref.get("tab", "calc"));
+
+/* ---------- PWA ---------- */
+let installEvt = null;
+window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); installEvt = e; $("#bInstall").hidden = false; });
+$("#bInstall").onclick = async () => { if (!installEvt) return; installEvt.prompt(); await installEvt.userChoice; installEvt = null; $("#bInstall").hidden = true; };
+if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register("sw.js").catch(() => {});
+})();
+</script>
+</body>
+</html>

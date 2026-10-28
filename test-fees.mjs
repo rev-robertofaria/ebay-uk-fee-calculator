@@ -1,6 +1,8 @@
 // Run: node test-fees.mjs
 import { readFileSync } from "node:fs";
-import { calcBusiness, calcPrivate, calcLive, buyerProtectionFee, privatePriceForDisplayed, priceForTarget, findCategory } from "./fees.js";
+import "./fees.js";
+const { calcBusiness, calcPrivate, calcLive, buyerProtectionFee, privatePriceForDisplayed, priceForTarget, findCategory } = globalThis.EbayFees;
+import { execFileSync } from "node:child_process";
 
 const rates = JSON.parse(readFileSync(new URL("./data/rates.json", import.meta.url), "utf8"));
 let n = 0, failed = 0;
@@ -108,6 +110,9 @@ eq("price for £1 profit reaches target", calcBusiness(rates, { categoryId: VG, 
 eq("price for £1 profit is minimal", calcBusiness(rates, { categoryId: VG, itemPrice: p - 0.02, itemCost: 0.27, postageCost: 0.91, packaging: 0.10 }).profit < 1 ? 1 : 0, 1);
 
 /* --- data sanity --- */
+// data/rates.js (loaded by index.html) must be generated from data/rates.json
+const ratesJs = readFileSync(new URL("./data/rates.js", import.meta.url), "utf8");
+eq("rates.js in sync with rates.json", ratesJs.includes(JSON.stringify(rates)) ? 1 : 0, 1);
 eq("74 category ids", new Set(rates.business.categories.flatMap((c) => c.id)).size, 74);
 eq("Everything Else exists", findCategory(rates, 99) ? 1 : 0, 1);
 
