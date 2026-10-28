@@ -368,14 +368,32 @@ function inputs() {
 }
 const calc = { business: F.calcBusiness, private: F.calcPrivate, live: F.calcLive };
 function renderResult(r, inp) {
-  const lines = r.lines.map((l) => `<tr><td>${l.label}</td><td class="money">${l.amount ? "−" + money(l.amount) : money(0)}</td></tr>`).join("");
+  const isPriv = mode === "private" && r.buyerProtectionFee;
+  const earnings = F.round2(r.netProceeds - inp.postageCost);          // = "Order earnings" in Seller Hub
+  const ownCosts = F.round2(inp.itemCost * inp.qty + inp.packaging + inp.otherCosts);
   const cls = r.profit >= 0 ? "pos" : "neg";
-  const buyer = mode === "private" && r.buyerProtectionFee ? `<div class="kpi"><div class="l">Buyer sees / pays</div><div class="v money">${money(r.buyerPays)}</div><div class="small">incl. ${money(r.buyerProtectionFee)} Buyer Protection fee paid to eBay</div></div>` : `<div class="kpi"><div class="l">Buyer pays</div><div class="v money">${money(r.buyerPays)}</div></div>`;
-  return `<div class="kpis">${buyer}<div class="kpi"><div class="l">eBay fees</div><div class="v money">${money(r.feesTotal)}</div><div class="small">${r.feesPctOfSale}% of sale</div></div>
-    <div class="kpi"><div class="l">You receive from eBay</div><div class="v money">${money(r.netProceeds)}</div></div>
-    <div class="kpi"><div class="l">Your costs</div><div class="v money">${money(r.costs + r.outputVat)}</div>${r.outputVat ? `<div class="small">incl. ${money(r.outputVat)} output VAT</div>` : ""}</div>
+  const row = (l, v, c) => `<tr${c ? ` class="${c}"` : ""}><td>${l}</td><td class="money">${v}</td></tr>`;
+  let t = "";
+  if (isPriv) {
+    t += row("What the buyer paid (order total)", money(r.buyerPays));
+    t += row("Buyer Protection fee — collected by eBay from the buyer", "−" + money(r.buyerProtectionFee));
+    t += row(`<strong>Your item price</strong>${inp.qty > 1 ? ` × ${inp.qty}` : ""}${inp.postageCharged ? " + postage" : ""}`, `<strong>${money(r.total)}</strong>`);
+  } else {
+    t += row(`<strong>Order total</strong> (item${inp.qty > 1 ? ` × ${inp.qty}` : ""}${inp.postageCharged ? " + postage" : ""})`, `<strong>${money(r.total)}</strong>`);
+  }
+  for (const l of r.lines) t += row(l.label, l.amount ? "−" + money(l.amount) : money(0));
+  if (inp.postageCost) t += row("Postage label (you pay)", "−" + money(inp.postageCost));
+  t += row("<strong>Order earnings</strong> — as shown in Seller Hub", `<strong>${money(earnings)}</strong>`, "total");
+  if (ownCosts) t += row("Your item cost, packaging and other costs", "−" + money(ownCosts));
+  if (r.outputVat) t += row("Output VAT (price includes VAT)", "−" + money(r.outputVat));
+  t += row("<strong>Profit</strong>", `<strong class="${cls}">${money(r.profit)}</strong>`, "total");
+  const buyer = isPriv ? `<div class="kpi"><div class="l">Buyer sees / pays</div><div class="v money">${money(r.buyerPays)}</div><div class="small">your price ${money(r.total)} + ${money(r.buyerProtectionFee)} Buyer Protection fee</div></div>` : `<div class="kpi"><div class="l">Buyer pays</div><div class="v money">${money(r.buyerPays)}</div></div>`;
+  return `<div class="kpis">${buyer}<div class="kpi"><div class="l">eBay fees you pay</div><div class="v money">${money(r.feesTotal)}</div><div class="small">${r.feesPctOfSale}% of your sale</div></div>
+    <div class="kpi"><div class="l">Order earnings (Seller Hub)</div><div class="v money">${money(earnings)}</div></div>
+    <div class="kpi"><div class="l">Your other costs</div><div class="v money">${money(ownCosts + r.outputVat)}</div></div>
     <div class="kpi big"><div class="l">Profit</div><div class="v money ${cls}">${money(r.profit)}</div><div class="small">margin ${r.marginPct}%${r.roiPct != null ? ` · ROI ${r.roiPct}%` : ""}</div></div></div>
-    <table class="fees"><tr><td>Sale total (item${inp.qty > 1 ? ` × ${inp.qty}` : ""}${inp.postageCharged ? " + postage" : ""})</td><td class="money">${money(r.total)}</td></tr>${lines}<tr class="total"><td>Total eBay fees</td><td class="money">−${money(r.feesTotal)}</td></tr></table>`;
+    <table class="fees">${t}</table>
+    ${isPriv ? '<p class="small">eBay adds the Buyer Protection fee on top of your price and keeps it. You receive your item price in full; Seller Hub shows it as a deduction from the order total.</p>' : ""}`;
 }
 function update() {
   const inp = inputs();

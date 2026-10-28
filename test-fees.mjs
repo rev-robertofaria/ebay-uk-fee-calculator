@@ -31,6 +31,13 @@ eq("Order B buyer pays", r.buyerPays, 7.87);
 eq("Order B fees", r.feesTotal, 0);
 eq("Order B earnings", r.profit, 4.36);
 
+// Order C: 1 × £3.63, free postage, label £0.91, no ads → Seller Hub earnings £2.72; with item cost £0.27 → £2.45
+r = calcPrivate(rates, { itemPrice: 3.63, qty: 1, postageCost: 0.91 });
+eq("Order C BPF", r.buyerProtectionFee, 0.35);
+eq("Order C buyer pays", r.buyerPays, 3.98);
+eq("Order C earnings", r.profit, 2.72);
+eq("Order C profit with item cost", calcPrivate(rates, { itemPrice: 3.63, qty: 1, postageCost: 0.91, itemCost: 0.27 }).profit, 2.45);
+
 /* --- Match a displayed price (private) --- */
 eq("display £3.99 → set £3.64", privatePriceForDisplayed(rates, 3.99), 3.64);
 eq("display £21.50 → set £20.00", privatePriceForDisplayed(rates, 21.50), 20.00);
