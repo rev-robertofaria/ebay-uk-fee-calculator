@@ -12,6 +12,7 @@ Free fee and profit calculator for sellers on **eBay.co.uk** (GBP). Single HTML 
 
 ## Status
 - [x] Official rate table (`data/rates.json`): business, private and eBay Live, all categories and exceptions
+- [x] Fee engine (`fees.js`) with tests (`node test-fees.mjs`, 61 assertions)
 - [ ] Calculator page
 
 ## Rates

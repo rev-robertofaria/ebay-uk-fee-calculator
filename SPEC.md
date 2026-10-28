@@ -67,8 +67,15 @@ Dado custo + margem alvo (%) ou lucro alvo (£) → preço mínimo por bissecç�
 ### 3.6 Comparador Private vs Business
 Mesmo item, lado a lado: o que o **comprador paga** (Private: item + BPF; Business: item), o que o **vendedor recebe**, lucro, e o "preço Business equivalente" = preço que dá ao comprador o mesmo total e/ou ao vendedor o mesmo líquido.
 
+### 3.7 Decisões de escopo (28/10/2026, Roberto)
+- **Promoted Listings:** só um campo opcional "Ad rate %", em branco por defeito. Sem tabela nem taxa sugerida (varia muito e cada vendedor sabe a sua).
+- **Portes:** só um campo "Postage cost" preenchido pelo utilizador. Sem tabelas de correio.
+- **Foco:** taxas fixas do eBay, Private e Business.
+- **Arredondamento:** cada linha de taxa arredonda ao cêntimo (como o Seller Hub). O inverso "Match a displayed price" respeita esse arredondamento.
+
 ## 4. Interface
 - Tabs: **Calculator · Compare · Rates · About**.
+- Função de destaque: **Match a displayed price** — dado o preço que a concorrência mostra, devolve o preço a definir em Private (abaixo da BPF) e em Business, lado a lado, com o que sobra em cada caso.
 - Entradas: mode, category (pesquisa + lista completa, com exceções indentadas), 2nd category (opcional), item price, quantity, postage charged, buyer location, item cost, postage cost, packaging, other costs; *Advanced*: shop level, listing fee, upgrades, promoted %, seller level, Top Rated Premium, VAT registered, price includes VAT, reduced per-order (Collectables).
 - Saída: tabela de taxas linha a linha (com % e base), líquido, lucro, margem, ROI; aviso "estimate".
 - Rates: tabela completa pesquisável + data de verificação + links oficiais.
