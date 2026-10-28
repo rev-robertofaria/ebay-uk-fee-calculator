@@ -14,3 +14,4 @@ Calculadora pública e gratuita de taxas e lucro para vendedores do eBay.co.uk (
 
 ## Histórico
 - 28/10/2026 — Repo criado pelo Roberto. `rates.json` gerado a partir dos PDFs oficiais (business, private, Live; atualizados em 30/09/2026): 55 categorias/exceções. Próximo passo: página da calculadora.
+- 28/10/2026 — Auditoria do rates.json contra o PDF (74 IDs, 14 %, 9 limiares: OK). Lacunas corrigidas: private fora do UK (12.8%+30p, ROF 0.42%), upgrades de leilão, 2 categorias, promoted, premissa do limiar £10, Buyer Protection fee marcada como não verificada. SPEC v1 escrito; LICENSE MIT.

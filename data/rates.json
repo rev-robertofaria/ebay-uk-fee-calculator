@@ -13,6 +13,12 @@
    "Final value fee is charged on the total amount of the sale: item price + postage + applicable taxes.",
    "Tiered rates are calculated per item.",
    "Motors (cars, motorcycles, vehicles) are not covered."
+  ],
+  "out_of_scope": [
+   "Motors (cars, motorcycles, vehicles)",
+   "Listings on other eBay sites (eBay.de, eBay.com…): that site's fees apply; the GBP currency conversion charge (2.5% / 2.75% from 01/12/2026) only arises there",
+   "Fee credits on refunds/cancellations",
+   "Postage label prices"
   ]
  },
  "business": {
@@ -22,7 +28,9 @@
    "up_to_threshold": 0.3,
    "above_threshold": 0.4,
    "reduced_up_to_threshold": 0.1,
-   "reduced_applies_to": "Home, Furniture & DIY listings created on/after 19/04/2022; selected Collectables listings created on/after 01/02/2022"
+   "reduced_applies_to": "Home, Furniture & DIY listings created on/after 19/04/2022; selected Collectables listings created on/after 01/02/2022",
+   "threshold_basis": "ASSUMPTION: total amount of the sale (item + postage). eBay text: 'orders £10.00 or less'.",
+   "reduced_collectables_list": "Not published on the fee page ('selected Collectables categories', link 'Learn more'). Calculator: opt-in checkbox."
   },
   "regulatory_operating_fee_pct": 0.35,
   "international_fee_pct": {
@@ -83,7 +91,8 @@
     "free_auction_7day": 1000,
     "extra_fixed_price": 0,
     "extra_auction": 0.15
-   }
+   },
+   "note": "Listing and upgrade fees also apply each month for Good 'Til Cancelled listings and on every relist."
   },
   "upgrades": {
    "subtitle": 2.0,
@@ -95,7 +104,21 @@
    ],
    "international_site_visibility_fixed_price": 0.25,
    "reserve_pct": 4,
-   "reserve_max": 150
+   "reserve_max": 150,
+   "international_site_visibility_auction": [
+    {
+     "start_price_below": 5,
+     "fee": 0.04
+    },
+    {
+     "start_price_below": 30,
+     "fee": 0.08
+    },
+    {
+     "start_price_from": 30,
+     "fee": 0.13
+    }
+   ]
   },
   "categories": [
    {
@@ -914,7 +937,12 @@
      }
     ]
    }
-  ]
+  ],
+  "two_categories": "If listed in two categories, the higher final value fee applies.",
+  "promoted_listings": {
+   "general": "seller-chosen % of total amount of the sale, charged only when the item sells",
+   "vat": "VAT may be added"
+  }
  },
  "private": {
   "fees_include_vat": true,
@@ -942,7 +970,43 @@
    "gallery_plus": 2.5,
    "second_category": 0.35,
    "special_duration": 0.35,
-   "international_site_visibility_fixed_price": 0.3
+   "international_site_visibility_fixed_price": 0.3,
+   "international_site_visibility_auction": [
+    {
+     "start_price_below": 5,
+     "fee": 0.05
+    },
+    {
+     "start_price_below": 30,
+     "fee": 0.1
+    },
+    {
+     "start_price_from": 30,
+     "fee": 0.15
+    }
+   ],
+   "reserve_pct": 4,
+   "reserve_max": 150
+  },
+  "buyer_protection_fee": {
+   "paid_by": "buyer",
+   "status": "NOT YET VERIFIED — needs official page 'Buyer protection fee' (help id=5594)"
+  },
+  "postage_note": "Many UK private listings use eBay Simple Delivery, where the buyer pays postage and eBay issues the label; seller postage cost may be £0.",
+  "registered_outside_uk": {
+   "fees_include_vat": true,
+   "final_value_fee_pct": 12.8,
+   "per_order_fee": 0.3,
+   "single_item_above": {
+    "threshold": 5000,
+    "pct": 3
+   },
+   "trainers_item_price_at_least_100": {
+    "pct": 8,
+    "per_order_fee": 0.3
+   },
+   "regulatory_operating_fee_pct": 0.42,
+   "international_fee": "see fee page of country of residence"
   }
  },
  "live": {
