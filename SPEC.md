@@ -36,7 +36,14 @@ fvf = 0 · rof = 0 · intl = 3% × total se entrega fora do UK
 listing = 0 até 300/mês (400 com loja £19.99), depois £0.35
 upgrades opcionais
 ```
-Nota na UI: Simple Delivery (comprador paga portes). Buyer Protection fee **só entra quando houver fonte oficial** (ver §8).
+Nota na UI: Simple Delivery (comprador paga portes).
+**Buyer Protection fee** (oficial, paga pelo comprador, com IVA; base = preço do item, sem portes):
+```
+bpf_var  = Σ por item: 7% até £20 + 4% de £20–£300 + 2% de £300–£4,000 + 0% acima
+bpf_flat = £0.10 por item distinto (1× por anúncio em quantidades iguais)
+buyer_sees = item_price + bpf  (+ postage)
+```
+Exemplos oficiais usados nos testes: £5 → £0.45 · £20 → £1.50 · £1,500 → £36.70 · £7,500 → £86.70 · 2× £20 iguais → £2.90.
 Sub-opção: *Private seller registered outside the UK* → 12.8% + 30p, 3% acima de £5,000 (item único), ROF 0.42%, trainers 8% + 30p (item ≥ £100).
 
 ### 3.3 eBay Live (sem IVA)
@@ -58,7 +65,7 @@ margin       = profit / total · roi = profit / costs
 Dado custo + margem alvo (%) ou lucro alvo (£) → preço mínimo por bissecção (tiers tornam a função não linear). Mostrar também break-even.
 
 ### 3.6 Comparador Private vs Business
-Mesmo item, lado a lado: taxas, lucro, e "preço Business equivalente" (para o vendedor ficar com o mesmo líquido).
+Mesmo item, lado a lado: o que o **comprador paga** (Private: item + BPF; Business: item), o que o **vendedor recebe**, lucro, e o "preço Business equivalente" = preço que dá ao comprador o mesmo total e/ou ao vendedor o mesmo líquido.
 
 ## 4. Interface
 - Tabs: **Calculator · Compare · Rates · About**.
@@ -89,11 +96,16 @@ test-fees.mjs         testes do motor
 README.md (EN) · SPEC.md · MEMORIA-PROJETO.md (PT) · LICENSE (MIT) · .nojekyll
 ```
 
+## 6b. Alterações agendadas (aviso visível no README, no rates.json e na aba About da app)
+- 01/12/2026 — conversão de moeda 2.5% → 2.75% (só anúncios noutros sites eBay).
+- 31/12/2026 — fim da promoção eBay Live (£0.10 → £0.30 por pedido ≤ £10).
+A app mostra um banner "Rates change on <data>" a partir de 14 dias antes e "Rates verified on <data>" sempre.
+
 ## 7. Fora de escopo v1
 Motors; anúncios noutros sites eBay (taxas desse site + conversão 2.5%/2.75%); créditos de taxas em reembolsos; preço de etiquetas de portes; Etsy/Vinted (repositório próprio no futuro).
 
 ## 8. Pendências abertas
-- [ ] **Buyer Protection fee** (paga pelo comprador, Private): precisa do PDF oficial de https://www.ebay.co.uk/help/buying/paying-items/buyer-protection-fee?id=5594 — sem ele o comparador não mostra o preço final ao comprador.
+- [x] Buyer Protection fee — fonte oficial recebida 28/10/2026.
 - [ ] Lista das "selected Collectables categories" com per-order 10p (eBay só dá link "Learn more").
 - [ ] Confirmar no Seller Hub, após 1ª venda Business, a base do limiar £10 (com ou sem portes).
 - [ ] Ativar GitHub Pages (Roberto) após o 1º deploy do `index.html`.
