@@ -60,7 +60,7 @@ nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:8px 0 1
 @media (max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
 .card h2{font-size:1.05rem;margin:0 0 12px}
-.cardhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.cardhead h2{margin:0}.btn.sm{min-height:36px;padding:4px 10px;font-size:.9rem}
+.cardhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.cardhead h2{margin:0}.btn.sm{min-height:40px;padding:6px 14px;font-size:.95rem}.btn.sm.primary{box-shadow:0 1px 3px rgba(0,0,0,.18)}
 .card h3{font-size:.95rem;margin:16px 0 8px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
 
 .seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:14px}
@@ -135,7 +135,7 @@ footer{margin-top:28px;color:var(--muted);font-size:.85rem;text-align:center}
 <section id="tab-calc" role="tabpanel">
 <div class="grid">
   <div class="card">
-    <div class="cardhead"><h2>Your sale</h2><button class="btn sm" id="bReset" title="Clear all fields and start again">New calculation</button></div>
+    <div class="cardhead"><h2>Your sale</h2><button class="btn sm primary" id="bReset" title="Clear all fields and start again">↺ New Calculation</button></div>
     <div class="seg" role="group" aria-label="Seller type">
       <button data-mode="business" aria-pressed="true">Business</button>
       <button data-mode="private" aria-pressed="false">Private</button>
@@ -220,7 +220,7 @@ footer{margin-top:28px;color:var(--muted);font-size:.85rem;text-align:center}
 <section id="tab-compare" role="tabpanel" hidden>
 <div class="grid">
   <div class="card">
-    <div class="cardhead"><h2>Private vs Business — match a displayed price</h2><button class="btn sm" id="bResetC" title="Clear all fields">Clear</button></div>
+    <div class="cardhead"><h2>Private vs Business — match a displayed price</h2><button class="btn sm primary" id="bResetC" title="Clear all fields">↺ New Calculation</button></div>
     <p class="small">Buyers compare the price they <em>see</em>. On private listings eBay adds a Buyer Protection fee on top of your price; on business listings there is none. Enter the shelf price you want to match and see what each account type must set and keeps.</p>
     <div class="row2">
       <div class="field"><label for="cDisplayed">Price the buyer sees (each) £</label><input id="cDisplayed" type="text" inputmode="decimal" placeholder="e.g. 3.99"></div>
