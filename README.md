@@ -14,18 +14,18 @@ Free fee and profit calculator for sellers on **eBay.co.uk** (GBP). Single HTML 
 
 ## Status
 - [x] Official rate table (`data/rates.json`): business, private and eBay Live, all categories and exceptions
-- [x] Fee engine (`fees.js`) with tests (`node test-fees.mjs`, 61 assertions)
+- [x] Fee engine (`fees.js`) with tests (`node test-fees.mjs`, 66 assertions)
 - [x] Calculator page (`index.html`): Business, Private, eBay Live; Private vs Business comparison; full rate table; installable, offline
-- [ ] Published on GitHub Pages
+- [x] Published on GitHub Pages: https://rev-robertofaria.github.io/ebay-uk-fee-calculator/
 
 ## Use it
-- Online: https://rev-robertofaria.github.io/ebay-uk-fee-calculator/ (once GitHub Pages is enabled)
+- Online: https://rev-robertofaria.github.io/ebay-uk-fee-calculator/
 - Offline / installed: Chrome or Edge → **Install**; iPhone or iPad → Share → **Add to Home Screen**. Works without internet after the first visit.
 - Locally: clone the repo and open `index.html` in any modern browser (Safari 15+, Chrome, Edge, Firefox). No build step.
 
 ## Develop
 ```
-node test-fees.mjs      # 62 assertions: eBay's official examples + anonymised real orders
+node test-fees.mjs      # 66 assertions: eBay's official examples + anonymised real orders
 node build-rates.mjs    # regenerate data/rates.js after editing data/rates.json
 ```
 After changing `index.html`, `fees.js` or `data/rates.js`, bump `CACHE` in `sw.js`.
@@ -46,5 +46,5 @@ What `data/rates.json` covers:
 Sources:
 - [Fees for business sellers](https://www.ebay.co.uk/help/selling/fees-credits-invoices/fees-business-sellers-activated-managed-payments?id=4809)
 - [Fees for private sellers](https://www.ebay.co.uk/help/selling/fees-credits-invoices/fees-private-sellers-activated-managed-payments?id=4822)
-- [Buyer Protection fee](https://www.ebay.co.uk/help/buying/paying-items/buyer-protection-fee?id=5594) · [Buyer Protection – information for sellers](https://www.ebay.co.uk/help/selling/selling/buyer-protection-information-sellers)
+- [Buyer Protection fee](https://www.ebay.co.uk/help/buying/paying-items/buyer-protection-fee?id=5594) · [Buyer Protection – information for sellers](https://www.ebay.co.uk/help/selling/selling/pricing-items/buyer-protection-information-sellers?id=5595)
 - [eBay Live selling fees](https://www.ebay.co.uk/help/selling/ebay-live/ebay-live-selling-fees?id=5870)
