@@ -24,3 +24,10 @@ Calculadora pública e gratuita de taxas e lucro para vendedores do eBay.co.uk (
 - 29/10/2026 — Pente fino: corrigida a URL oficial da página "Buyer Protection – information for sellers" (id=5595); README atualizado (66 testes, Pages publicado). Sem dados pessoais no repo. SW v8.
 - 29/10/2026 — Decisão do Roberto: no PC a calculadora é usada no navegador, sem instalar (o Markdown.md instalado antes da correção do `id` captura os links do domínio; reinstalação adiada para evitar confusão). No telemóvel está instalada. Autoria dos próximos commits: rev-robertofaria.
 - 29/10/2026 — eBay Live removido por completo (modo, motor, taxas, testes, textos), a pedido do Roberto. Alteração agendada restante: só a conversão de moeda em 01/12/2026. SW v9.
+
+## Procedimento — atualização de 01/12/2026 (conversão de moeda 2.5% → 2.75%)
+1. Obter o PDF atual da página oficial Business (id=4809) e confirmar se há outras alterações.
+2. `data/rates.json`: `business.currency_conversion_pct` e `private.currency_conversion_pct` → só `{ "from": "01/12/2026", "pct": 2.75 }`; remover a entrada de `meta.scheduled_changes`; atualizar `meta.verified_on`.
+3. `node build-rates.mjs` → `node test-fees.mjs` → subir `CACHE` em `sw.js`.
+4. Retirar o banner "Rate changes scheduled" do README.
+5. Commit + push em `main`.
