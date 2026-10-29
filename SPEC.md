@@ -46,7 +46,9 @@ buyer_sees = item_price + bpf  (+ postage)
 Exemplos oficiais usados nos testes: £5 → £0.45 · £20 → £1.50 · £1,500 → £36.70 · £7,500 → £86.70 · 2× £20 iguais → £2.90.
 Sub-opção: *Private seller registered outside the UK* → 12.8% + 30p, 3% acima de £5,000 (item único), ROF 0.42%, trainers 8% + 30p (item ≥ £100).
 
-### 3.3 eBay Live (sem IVA)
+### 3.3 eBay Live — REMOVIDO em 29/10/2026 (decisão do Roberto: nicho de leilões ao vivo, fora do público-alvo)
+
+~~
 ```
 commission = min(6% × total, £100/item)   (4% para Coins/Bullion/Sneakers)
 processing = 2.42% × total
@@ -105,11 +107,10 @@ README.md (EN) · SPEC.md · MEMORIA-PROJETO.md (PT) · LICENSE (MIT) · .nojeky
 
 ## 6b. Alterações agendadas (aviso visível no README, no rates.json e na aba About da app)
 - 01/12/2026 — conversão de moeda 2.5% → 2.75% (só anúncios noutros sites eBay).
-- 31/12/2026 — fim da promoção eBay Live (£0.10 → £0.30 por pedido ≤ £10).
 A app mostra um banner "Rates change on <data>" a partir de 14 dias antes e "Rates verified on <data>" sempre.
 
 ## 7. Fora de escopo v1
-Motors; anúncios noutros sites eBay (taxas desse site + conversão 2.5%/2.75%); créditos de taxas em reembolsos; preço de etiquetas de portes; Etsy/Vinted (repositório próprio no futuro).
+Motors; eBay Live; anúncios noutros sites eBay (taxas desse site + conversão 2.5%/2.75%); créditos de taxas em reembolsos; preço de etiquetas de portes; Etsy/Vinted (repositório próprio no futuro).
 
 ## 8. Pendências abertas
 - [x] Buyer Protection fee — fonte oficial recebida 28/10/2026.

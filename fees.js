@@ -168,28 +168,10 @@ function calcPrivate(rates, input) {
   return r;
 }
 
-/* ---------- eBay LIVE ---------- */
-function calcLive(rates, input) {
-  const inp = baseInputs(input);
-  const L = rates.live;
-  const total = inp.itemPrice * inp.qty + inp.postageCharged;
-  const g = input.liveGroup === "coins_bullion_sneakers" ? L.groups.coins_bullion_sneakers : L.groups.all_other;
-  const commission = Math.min((inp.itemPrice + inp.postageCharged / inp.qty) * g.commission_pct / 100, g.commission_cap_per_item) * inp.qty;
-  const promoOn = input.asOf ? input.asOf <= "2026-12-31" : true;
-  const perOrder = promoOn && total <= 10 ? L.promotion.per_order_fee_orders_up_to_10 : L.per_order_fee;
-  const lines = [
-    { key: "commission", label: `Commission (${g.commission_pct}%, cap £${g.commission_cap_per_item}/item)`, amount: round2(commission) },
-    { key: "processing", label: `Payment processing (${L.payment_processing_pct}%)`, amount: round2(total * L.payment_processing_pct / 100) },
-    { key: "per_order", label: `Per-order fee${perOrder < L.per_order_fee ? " (promotion to 31/12/2026)" : ""}`, amount: round2(perOrder) },
-  ];
-  if (inp.adPct) lines.push({ key: "ads", label: `Promoted Listings (${inp.adPct}%)`, amount: round2(total * inp.adPct / 100) });
-  return finish(rates, inp, lines, total, !inp.vatRegistered);
-}
-
 /* ---------- inverse: price needed for a target ---------- */
 function priceForTarget(rates, mode, input, target) {
   // target: { profit: £ } or { marginPct: % }. Returns item price per unit (2 dp) or null.
-  const f = { business: calcBusiness, private: calcPrivate, live: calcLive }[mode];
+  const f = { business: calcBusiness, private: calcPrivate }[mode];
   const ok = (p) => { const r = f(rates, { ...input, itemPrice: p }); return target.profit != null ? r.profit >= target.profit : r.marginPct >= target.marginPct; };
   let lo = 0, hi = 10;
   while (!ok(hi) && hi < 1e7) hi *= 2;
@@ -198,4 +180,4 @@ function priceForTarget(rates, mode, input, target) {
   return Math.ceil(hi * 100) / 100;
 }
 
-globalThis.EbayFees = { round2, findCategory, tieredFee, buyerProtectionFee, privatePriceForDisplayed, calcBusiness, calcPrivate, calcLive, priceForTarget };
+globalThis.EbayFees = { round2, findCategory, tieredFee, buyerProtectionFee, privatePriceForDisplayed, calcBusiness, calcPrivate, priceForTarget };

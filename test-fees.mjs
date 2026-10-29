@@ -1,7 +1,7 @@
 // Run: node test-fees.mjs
 import { readFileSync } from "node:fs";
 import "./fees.js";
-const { calcBusiness, calcPrivate, calcLive, buyerProtectionFee, privatePriceForDisplayed, priceForTarget, findCategory } = globalThis.EbayFees;
+const { calcBusiness, calcPrivate, buyerProtectionFee, privatePriceForDisplayed, priceForTarget, findCategory } = globalThis.EbayFees;
 import { execFileSync } from "node:child_process";
 
 const rates = JSON.parse(readFileSync(new URL("./data/rates.json", import.meta.url), "utf8"));
@@ -101,15 +101,6 @@ eq("Private outside UK 30p", line(r, "per_order"), 0.30);
 eq("Private outside UK ROF 0.42%", line(r, "rof"), 0.42);
 eq("Private outside UK no BPF", r.buyerProtectionFee, 0);
 eq("Private outside UK £6,000: 12.8% to £5,000 + 3%", line(calcPrivate(rates, { itemPrice: 6000, outsideUK: true }), "fvf"), 670.00);
-
-/* --- eBay Live --- */
-r = calcLive(rates, { itemPrice: 100, asOf: "2026-11-01" });
-eq("Live commission 6%", line(r, "commission"), 6.00);
-eq("Live processing 2.42%", line(r, "processing"), 2.42);
-eq("Live per-order 30p", line(r, "per_order"), 0.30);
-eq("Live promo 10p ≤£10", line(calcLive(rates, { itemPrice: 8, asOf: "2026-11-01" }), "per_order"), 0.10);
-eq("Live promo ended", line(calcLive(rates, { itemPrice: 8, asOf: "2027-01-01" }), "per_order"), 0.30);
-eq("Live commission cap £100 (6% of £3,000)", line(calcLive(rates, { itemPrice: 3000 }), "commission"), 100.00);
 
 /* --- Inverse --- */
 const p = priceForTarget(rates, "business", { categoryId: VG, itemCost: 0.27, postageCost: 0.91, packaging: 0.10 }, { profit: 1.00 });

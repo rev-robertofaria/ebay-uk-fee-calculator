@@ -139,7 +139,6 @@ footer{margin-top:28px;color:var(--muted);font-size:.85rem;text-align:center}
     <div class="seg" role="group" aria-label="Seller type">
       <button data-mode="business" aria-pressed="true">Business</button>
       <button data-mode="private" aria-pressed="false">Private</button>
-      <button data-mode="live" aria-pressed="false">eBay Live</button>
     </div>
 
     <div id="catBlock">
@@ -149,10 +148,6 @@ footer{margin-top:28px;color:var(--muted);font-size:.85rem;text-align:center}
         <select id="cat" aria-label="Category"></select>
         <span class="hint" id="catHint"></span>
       </div>
-    </div>
-    <div id="liveBlock" hidden>
-      <div class="field"><label for="liveGroup">Item type</label>
-        <select id="liveGroup"><option value="all_other">All other categories (6% commission)</option><option value="coins_bullion_sneakers">Coins, Bullion or Sneakers (4% commission)</option></select></div>
     </div>
 
     <div class="row2">
@@ -258,8 +253,6 @@ footer{margin-top:28px;color:var(--muted);font-size:.85rem;text-align:center}
   <div id="bizOther" class="small"></div>
   <h3>Private sellers (UK-based)</h3>
   <div id="privOther" class="small"></div>
-  <h3>eBay Live</h3>
-  <div id="liveOther" class="small"></div>
   <h3>Scheduled changes</h3>
   <div id="sched" class="small"></div>
 </div>
@@ -276,11 +269,10 @@ footer{margin-top:28px;color:var(--muted);font-size:.85rem;text-align:center}
   <ul>
     <li>Business: final value fee % by category on item + postage, tiered rates per item, per-order fee (£0.30 / £0.40, reduced 10p where eBay says so), 0.35% regulatory operating fee, international fee by the buyer's delivery region, optional surcharges and Top Rated discount, then 20% VAT on fees unless you are VAT registered.</li>
     <li>Private (UK): no final value fee. The Buyer Protection fee (£0.10 + 7% to £20, 4% to £300, 2% to £4,000) is paid by the buyer on top of your price — the calculator shows the price the buyer sees. 3% international fee if posting abroad. VAT is added to Promoted Listings fees.</li>
-    <li>eBay Live: commission (6%, or 4% for coins, bullion and sneakers, capped at £100 per item) + 2.42% payment processing + per-order fee.</li>
     <li>Assumption flagged for confirmation: the £10 per-order threshold is applied to the order total including postage.</li>
   </ul>
   <h3>Out of scope</h3>
-  <ul><li>Motors (cars, motorcycles, vehicles).</li><li>Listings on other eBay sites (eBay.de, eBay.com…): that site's fee card applies, plus the GBP currency conversion charge.</li><li>Fee credits on refunds and cancellations; postage label prices.</li></ul>
+  <ul><li>Motors (cars, motorcycles, vehicles) and eBay Live (livestream selling).</li><li>Listings on other eBay sites (eBay.de, eBay.com…): that site's fee card applies, plus the GBP currency conversion charge.</li><li>Fee credits on refunds and cancellations; postage label prices.</li></ul>
   <h3>Install &amp; offline</h3>
   <p>Chrome / Edge: use the <em>Install</em> button. iPhone / iPad: Share → <em>Add to Home Screen</em>. After the first visit the calculator works without internet.</p>
   <h3>Privacy</h3>
@@ -352,9 +344,9 @@ let mode = "business";
 function setMode(m) {
   mode = m;
   document.querySelectorAll(".seg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === m)));
-  $("#catBlock").hidden = m !== "business"; $("#liveBlock").hidden = m !== "live";
+  $("#catBlock").hidden = m !== "business";
   $("#advBiz").hidden = m !== "business"; $("#advPriv").hidden = m !== "private";
-  $("#listingHint").textContent = m === "business" ? "No Shop: £0.30 per listing · Basic Shop £27/month: 250 free, then 10p" : m === "private" ? "300 free listings a month, then £0.35" : "No insertion fee on eBay Live";
+  $("#listingHint").textContent = m === "business" ? "No Shop: £0.30 per listing · Basic Shop £27/month: 250 free, then 10p" : "300 free listings a month, then £0.35";
   update();
 }
 document.querySelectorAll(".seg button").forEach((b) => b.onclick = () => setMode(b.dataset.mode));
@@ -366,9 +358,9 @@ function inputs() {
     packaging: num("packaging"), otherCosts: num("otherCosts"), adPct: num("adPct"), listingFee: num("listingFee"), upgrades: num("upgrades"),
     vatRegistered: $("#vatRegistered").checked, priceIncludesVat: $("#priceIncludesVat").checked, reducedPerOrder: $("#reducedPerOrder").checked,
     topRatedPremium: $("#topRatedPremium").checked, sellerSurcharge: $("#sellerSurcharge").value || null,
-    outsideUK: $("#outsideUK").checked, trainers: $("#trainers").checked, liveGroup: $("#liveGroup").value, asOf: isoToday };
+    outsideUK: $("#outsideUK").checked, trainers: $("#trainers").checked };
 }
-const calc = { business: F.calcBusiness, private: F.calcPrivate, live: F.calcLive };
+const calc = { business: F.calcBusiness, private: F.calcPrivate };
 function renderResult(r, inp) {
   const isPriv = mode === "private" && r.buyerProtectionFee;
   const earnings = F.round2(r.netProceeds - inp.postageCost);          // = "Order earnings" in Seller Hub
@@ -452,7 +444,7 @@ function renderRates(filter) {
 renderRates("");
 $("#rateSearch").addEventListener("input", (e) => renderRates(e.target.value));
 (function others() {
-  const B = R.business, P = R.private, L = R.live;
+  const B = R.business, P = R.private;
   $("#bizOther").innerHTML = `<ul><li>Per-order fee: £${B.per_order_fee.up_to_threshold.toFixed(2)} (order ≤ £10) · £${B.per_order_fee.above_threshold.toFixed(2)} (over £10) · reduced £${B.per_order_fee.reduced_up_to_threshold.toFixed(2)} in Home, Furniture &amp; DIY and selected Collectables.</li>
     <li>Regulatory operating fee: ${B.regulatory_operating_fee_pct}% of the total sale.</li>
     <li>International fee (delivery address outside the UK): Eurozone &amp; Northern Europe ${B.international_fee_pct.eurozone_and_northern_europe}% · US &amp; Canada ${B.international_fee_pct.us_and_canada}% · other ${B.international_fee_pct.other_countries}%.</li>
@@ -463,7 +455,6 @@ $("#rateSearch").addEventListener("input", (e) => renderRates(e.target.value));
     <li>Buyer Protection fee, paid by the <strong>buyer</strong> on top of your price: £0.10 per item + 7% up to £20, 4% from £20 to £300, 2% from £300 to £4,000. Flat fee charged once for identical items in one listing.</li>
     <li>International fee ${P.international_fee_pct}% if the delivery address is outside the UK. Dispute fee £${P.dispute_fee.toFixed(2)}. Private fees include VAT.</li>
     <li>Private sellers registered outside the UK: ${P.registered_outside_uk.final_value_fee_pct}% + 30p per order (3% above £5,000 on a single item), regulatory operating fee ${P.registered_outside_uk.regulatory_operating_fee_pct}%.</li></ul>`;
-  $("#liveOther").innerHTML = `<ul><li>Commission ${L.groups.all_other.commission_pct}% (coins, bullion, sneakers ${L.groups.coins_bullion_sneakers.commission_pct}%), capped at £${L.groups.all_other.commission_cap_per_item} per item · payment processing ${L.payment_processing_pct}% · £${L.per_order_fee.toFixed(2)} per order (promotion: £${L.promotion.per_order_fee_orders_up_to_10.toFixed(2)} on orders ≤ £10 until ${L.promotion.until}). No insertion fee. Fees exclude VAT.</li></ul>`;
   $("#sched").innerHTML = `<ul>${(R.meta.scheduled_changes || []).map((c) => `<li><strong>${c.date}</strong> — ${c.what}${c.applies_when ? ` <em>(${c.applies_when})</em>` : ""}.</li>`).join("")}</ul>
     <p>Seller currency conversion charge: ${B.currency_conversion_pct.map((x) => `${x.pct}% ${x.from ? "from " + x.from : "until " + x.until}`).join(" · ")} — only when eBay converts funds for items listed or sold on another eBay site.</p>`;
 })();
@@ -478,10 +469,10 @@ function showTab(name) {
 document.querySelectorAll(".tab").forEach((t) => t.onclick = () => showTab(t.dataset.tab));
 
 /* ---------- state in URL + localStorage ---------- */
-const FIELDS = ["cat", "cat2", "itemPrice", "qty", "postageCharged", "buyerRegion", "itemCost", "postageCost", "packaging", "otherCosts", "adPct", "listingFee", "upgrades", "vatRegistered", "priceIncludesVat", "reducedPerOrder", "topRatedPremium", "sellerSurcharge", "outsideUK", "trainers", "liveGroup", "targetProfit", "targetMargin"];
+const FIELDS = ["cat", "cat2", "itemPrice", "qty", "postageCharged", "buyerRegion", "itemCost", "postageCost", "packaging", "otherCosts", "adPct", "listingFee", "upgrades", "vatRegistered", "priceIncludesVat", "reducedPerOrder", "topRatedPremium", "sellerSurcharge", "outsideUK", "trainers", "targetProfit", "targetMargin"];
 function serialise() { const p = new URLSearchParams(); p.set("mode", mode); for (const id of FIELDS) { const el = $("#" + id); const v = el.type === "checkbox" ? (el.checked ? "1" : "") : el.value; if (v) p.set(id, v); } return p.toString(); }
 function saveState() { pref.set("state", serialise()); history.replaceState(null, "", location.pathname + (serialise() ? "?" + serialise() : "")); }
-function restore(qs) { const p = new URLSearchParams(qs); if (!p.toString()) return false; for (const id of FIELDS) { if (!p.has(id)) continue; const el = $("#" + id); if (el.type === "checkbox") el.checked = p.get(id) === "1"; else el.value = p.get(id); } setMode(p.get("mode") || "business"); return true; }
+function restore(qs) { const p = new URLSearchParams(qs); if (!p.toString()) return false; for (const id of FIELDS) { if (!p.has(id)) continue; const el = $("#" + id); if (el.type === "checkbox") el.checked = p.get(id) === "1"; else el.value = p.get(id); } const m = p.get("mode"); setMode(m === "private" ? "private" : "business"); return true; }
 function resetCalc() {
   for (const id of FIELDS) { const el = $("#" + id); if (!el) continue; if (el.type === "checkbox") el.checked = false; else if (el.tagName === "SELECT") el.selectedIndex = 0; else el.value = ""; }
   $("#qty").value = "1"; $("#catSearch").value = ""; fillSelect($("#cat"), "", 1249); fillSelect($("#cat2"), "", "", true); $("#buyerRegion").value = "uk";
